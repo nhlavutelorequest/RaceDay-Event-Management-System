@@ -1,6 +1,5 @@
 # RaceDay-Event-Management-System
 
-# RaceDay - Event Management System
 ### PROG6212 POE - Programming 2B
 
 RaceDay is a full-stack, cloud-aware event management platform built for the South African road running, walking, and cycling community. Event Organisers can create and manage events, categories, and participant results, while Participants can browse events, enter them, and track their personal performance history.
