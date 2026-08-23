@@ -32,7 +32,8 @@ All Part 1 planning documents are committed to the `/docs` folder:
 A GitHub Actions workflow 
 
 **CI/CD green build screenshot:**
-_[Insert screenshot of the successful GitHub Actions run here before submission]_
+_[<img width="1323" height="683" alt="image" src="https://github.com/user-attachments/assets/e688d1d8-6d43-439f-a8f5-3bc1fac7cd06" />
+]_
 
 ### Video walkthrough
 **YouTube link (unlisted):** _[Insert your unlisted YouTube link here]_
