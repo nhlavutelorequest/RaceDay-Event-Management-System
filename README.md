@@ -24,8 +24,8 @@ All Part 1 planning documents are committed to the `/docs` folder:
 
 
 - docs/ERD.pdf- Entity Relationship Diagram for the full RaceDay data model (6 entities).
-- `docs/API_Endpoint_Plan.md`-Full endpoint plan covering Authentication, User Profile, Events, Categories, Event Enrolments, and Results. 
-- `docs/RaceDay_Schema.sql-SQL Server script that creates and seeds the RaceDay database schema. Tested in SQL Server Management Studio (SSMS). 
+- docs/API_Endpoint_Plan.md`- Full endpoint plan covering Authentication, User Profile, Events, Categories, Event Enrolments, and Results. 
+- docs/RaceDay_Schema.sql-SQL Server script that creates and seeds the RaceDay database schema. Tested in SQL Server Management Studio (SSMS). 
 
 
 ### CI/CD
