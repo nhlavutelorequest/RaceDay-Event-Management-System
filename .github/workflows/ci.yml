@@ -23,7 +23,7 @@ jobs:
 
       - name: Verify required Part 1 files exist
         run: |
-          required_files=("docs/ERD.pdf" "docs/RaceDay_API_Endpoint_Plan.pdf" "docs/RaceDay_Database.sql")
+          required_files=("docs/ERD.pdf" "docs/RaceDay_API_Endpoint_Plan.pdf.pdf" "docs/RaceDay_Database.sql")
           missing=0
           for f in "${required_files[@]}"; do
             if [ ! -f "$f" ]; then
