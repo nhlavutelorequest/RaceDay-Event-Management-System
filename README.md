@@ -34,7 +34,7 @@ A GitHub Actions workflow
 <img width="1323" height="683" alt="image" src="https://github.com/user-attachments/assets/e688d1d8-6d43-439f-a8f5-3bc1fac7cd06" />
 
 ### Video walkthrough
-**YouTube link (unlisted):** _[https://youtu.be/fnTeI4-AHi4?si=Loz_87pzdS3DlO0j]_
+**YouTube link (unlisted):** _https://youtu.be/fnTeI4-AHi4?si=Loz_87pzdS3DlO0j_
 
 The video covers:
 - A walkthrough of the ERD and the reasoning behind the entity/relationship design
