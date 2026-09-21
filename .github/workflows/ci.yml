@@ -19,23 +19,16 @@ jobs:
             echo "ERROR: /docs folder is missing."
             exit 1
           fi
-          echo "docs folder found."
 
       - name: Verify required Part 1 files exist
         run: |
-          required_files=("docs/ERD.pdf" "docs/RaceDay_API_Endpoint_Plan.pdf.pdf" "docs/RaceDay_Database.sql")
-          missing=0
+          required_files=("docs/ERD.pdf" "docs/RaceDay_API_Endpoint_Plan.pdf" "docs/RaceDay_Database.sql")
           for f in "${required_files[@]}"; do
             if [ ! -f "$f" ]; then
               echo "ERROR: Missing required file: $f"
-              missing=1
-            else
-              echo "Found: $f"
+              exit 1
             fi
           done
-          if [ "$missing" -eq 1 ]; then
-            exit 1
-          fi
 
       - name: Verify README exists
         run: |
@@ -43,7 +36,23 @@ jobs:
             echo "ERROR: README.md is missing at repository root."
             exit 1
           fi
-          echo "README.md found."
 
-      - name: All Part 1 structure checks passed
-        run: echo "Repository structure is valid for Part 1 submission."
+  build-and-test-api:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 9
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore RaceDay.Api/RaceDay.Api.sln
+
+      - name: Build
+        run: dotnet build RaceDay.Api/RaceDay.Api.sln --no-restore --configuration Release
+
+      - name: Run unit tests
+        run: dotnet test RaceDay.Api/RaceDay.Api.sln --no-build --configuration Release --verbosity normal
