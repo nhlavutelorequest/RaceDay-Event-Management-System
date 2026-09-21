@@ -9,6 +9,7 @@ on:
 jobs:
   validate-part1-docs:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -22,13 +23,20 @@ jobs:
 
       - name: Verify required Part 1 files exist
         run: |
-          required_files=("docs/ERD.pdf" "docs/RaceDay_API_Endpoint_Plan.pdf" "docs/RaceDay_Database.sql")
+          required_files=(
+            "docs/ERD.pdf"
+            "docs/RaceDay_API_Endpoint_Plan.pdf"
+            "docs/RaceDay_Database.sql"
+          )
+
           for f in "${required_files[@]}"; do
             if [ ! -f "$f" ]; then
               echo "ERROR: Missing required file: $f"
               exit 1
             fi
           done
+
+          echo "All required Part 1 files are present."
 
       - name: Verify README exists
         run: |
@@ -37,8 +45,11 @@ jobs:
             exit 1
           fi
 
+          echo "README.md found."
+
   build-and-test-api:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -48,11 +59,22 @@ jobs:
         with:
           dotnet-version: '9.0.x'
 
+      - name: Verify API project exists
+        run: |
+          if [ ! -f "RaceDay.Api/RaceDay.Api/RaceDay.Api.csproj" ]; then
+            echo "ERROR: RaceDay.Api.csproj was not found."
+            echo "Current repository structure:"
+            find . -maxdepth 4 -type f \( -name "*.csproj" -o -name "*.sln" \) -print
+            exit 1
+          fi
+
+          echo "RaceDay.Api.csproj found."
+
       - name: Restore dependencies
-        run: dotnet restore RaceDay.Api/RaceDay.Api.sln
+        run: dotnet restore RaceDay.Api/RaceDay.Api/RaceDay.Api.csproj
 
       - name: Build
-        run: dotnet build RaceDay.Api/RaceDay.Api.sln --no-restore --configuration Release
+        run: dotnet build RaceDay.Api/RaceDay.Api/RaceDay.Api.csproj --no-restore --configuration Release
 
       - name: Run unit tests
-        run: dotnet test RaceDay.Api/RaceDay.Api.sln --no-build --configuration Release --verbosity normal
+        run: dotnet test RaceDay.Api/RaceDay.Api/RaceDay.Api.csproj --no-build --configuration Release --verbosity normal
