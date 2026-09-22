@@ -78,10 +78,10 @@ jobs:
           echo "RaceDay.Api.Tests.csproj found."
 
       - name: Restore dependencies
-        run: dotnet restore RaceDay.Api/RaceDay.Api.sln
+        run: dotnet restore RaceDay.Api/RaceDay.Api/RaceDay.Api.sln
 
       - name: Build
-        run: dotnet build RaceDay.Api/RaceDay.Api.sln --no-restore --configuration Release
+        run: dotnet build RaceDay.Api/RaceDay.Api/RaceDay.Api.sln --no-restore --configuration Release
 
       - name: Run unit tests
         run: dotnet test RaceDay.Api/RaceDay.Api.Tests/RaceDay.Api.Tests.csproj --no-build --configuration Release --verbosity normal
