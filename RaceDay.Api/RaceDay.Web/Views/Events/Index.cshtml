@@ -1,0 +1,71 @@
+﻿@model RaceDay.Web.Models.EventsIndexViewModel
+@{
+    ViewData["Title"] = "Events";
+    string Icon(string t) => t.ToLower() switch { "run" => "🏃", "walk" => "🚶", "cycle" => "🚴", _ => "🏅" };
+}
+
+<section class="page-header">
+    <h2 class="mb-1">Find your next race</h2>
+    <p class="mb-4 text-light opacity-75">Browse upcoming running, walking and cycling events.</p>
+
+    <form method="get" class="row g-2">
+        <div class="col-md-6">
+            <input type="text" name="search" value="@Model.Search" class="form-control form-control-lg"
+                   placeholder="Search by event name or location..." />
+        </div>
+        <div class="col-md-3">
+            <select name="type" class="form-select form-select-lg">
+                <option value="">All types</option>
+                <option value="Run" selected="@(Model.Type == "Run")">🏃 Run</option>
+                <option value="Walk" selected="@(Model.Type == "Walk")">🚶 Walk</option>
+                <option value="Cycle" selected="@(Model.Type == "Cycle")">🚴 Cycle</option>
+            </select>
+        </div>
+        <div class="col-md-3 d-grid">
+            <button type="submit" class="btn btn-warning btn-lg">Search</button>
+        </div>
+    </form>
+</section>
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">@ViewBag.Error</div>
+}
+
+@if (!Model.Events.Any())
+{
+    <div class="text-center py-5">
+        <div style="font-size:3rem">🔍</div>
+        <h5 class="mt-2">No events found</h5>
+        <p class="text-muted">Try a different search or filter.</p>
+    </div>
+}
+else
+{
+    <p class="text-muted mb-3">@Model.Events.Count event(s) found</p>
+    <div class="row g-4">
+        @foreach (var ev in Model.Events)
+        {
+            <div class="col-md-6 col-lg-4">
+                <div class="card event-card">
+                    <div class="event-banner banner-@ev.EventType.ToLower()"
+                         style="@(string.IsNullOrEmpty(ev.BannerImageUrl) ? "" : $"background-image:url('{ev.BannerImageUrl}')")">
+                        <span class="type-badge">@ev.EventType</span>
+                        @if (string.IsNullOrEmpty(ev.BannerImageUrl))
+                        {
+                            <span>@Icon(ev.EventType)</span>
+                        }
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="mb-2">@ev.Name</h5>
+                        <div class="meta mb-1">📅 @ev.EventDate.ToString("dd MMM yyyy, HH:mm")</div>
+                        <div class="meta mb-1">📍 @ev.Location</div>
+                        <div class="meta mb-1">📏 @ev.DistanceKm km</div>
+                        <div class="meta mb-3">👤 @ev.OrganiserName</div>
+                        <a class="btn btn-dark mt-auto" asp-action="Details" asp-route-id="@ev.EventId">View event</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
