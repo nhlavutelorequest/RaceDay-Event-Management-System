@@ -1,0 +1,87 @@
+﻿@model RaceDay.Web.Models.EventDetails
+@{
+    ViewData["Title"] = Model.Name;
+    var role = Context.Session.GetString("Role");
+    var loggedIn = !string.IsNullOrEmpty(Context.Session.GetString("UserName"));
+    string Icon(string t) => t.ToLower() switch { "run" => "🏃", "walk" => "🚶", "cycle" => "🚴", _ => "🏅" };
+}
+
+<a asp-action="Index" class="text-decoration-none text-muted">&larr; Back to events</a>
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger mt-3">⚠️ @TempData["Error"]</div>
+}
+<div class="event-hero banner-@Model.EventType.ToLower() mt-3"
+     style="@(string.IsNullOrEmpty(Model.BannerImageUrl) ? "" : $"background-image:url('{Model.BannerImageUrl}')")">
+    <div class="event-hero-overlay">
+        <span class="type-badge static">@Model.EventType</span>
+        <h1 class="mt-2 mb-0">@Model.Name</h1>
+        <div class="opacity-75">Organised by @Model.OrganiserName</div>
+    </div>
+</div>
+
+<div class="row g-4 mt-1">
+    <div class="col-lg-8">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="mb-3">About this event</h5>
+                <p class="mb-0">@(string.IsNullOrWhiteSpace(Model.Description) ? "No description provided." : Model.Description)</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="mb-3">Categories</h5>
+                @if (!Model.Categories.Any())
+                {
+                    <p class="text-muted mb-0">No categories have been added yet.</p>
+                }
+                else
+                {
+                    <div class="row g-3">
+                        @foreach (var c in Model.Categories)
+                        {
+                            <div class="col-md-6">
+                                <input type="radio" class="btn-check" name="categoryId" id="cat-@c.CategoryId"
+                                       value="@c.CategoryId" form="enrolForm" required />
+                                <label class="btn btn-outline-primary w-100 text-start p-3" for="cat-@c.CategoryId">
+                                    <strong>@c.CategoryName</strong>
+                                    <div class="small opacity-75">@(string.IsNullOrWhiteSpace(c.Description) ? "Open category" : c.Description)</div>
+                                </label>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card sticky-top" style="top:90px">
+            <div class="card-body">
+                <div class="fact"><span>📅 Date</span><strong>@Model.EventDate.ToString("dd MMM yyyy")</strong></div>
+                <div class="fact"><span>⏰ Start</span><strong>@Model.EventDate.ToString("HH:mm")</strong></div>
+                <div class="fact"><span>📍 Location</span><strong>@Model.Location</strong></div>
+                <div class="fact"><span>📏 Distance</span><strong>@Model.DistanceKm km</strong></div>
+                <div class="fact"><span>@Icon(Model.EventType) Type</span><strong>@Model.EventType</strong></div>
+
+                <hr />
+                @if (!loggedIn)
+                {
+                    <a class="btn btn-warning w-100" asp-controller="Account" asp-action="Login">Login to enrol</a>
+                }
+                else if (role == "Participant")
+                {
+                    <form id="enrolForm" method="post" asp-controller="Enrolments" asp-action="Enrol">
+                        <input type="hidden" name="eventId" value="@Model.EventId" />
+                        <button type="submit" class="btn btn-warning w-100">Enrol now</button>
+                    </form>
+                }
+                else
+                {
+                    <div class="alert alert-secondary mb-0 text-center">Organisers can't enrol in events.</div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

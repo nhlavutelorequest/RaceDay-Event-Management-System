@@ -1,9 +1,129 @@
-﻿@{
+﻿@model List<RaceDay.Web.Models.EventListItem>
+@{
     ViewData["Title"] = "Home";
+    var loggedIn = !string.IsNullOrEmpty(Context.Session.GetString("UserName"));
+    string Icon(string t) => t.ToLower() switch { "run" => "🏃", "walk" => "🚶", "cycle" => "🚴", _ => "🏅" };
 }
-<div class="text-center py-5">
-    <h1 class="display-4">Welcome to RaceDay</h1>
-    <p class="lead">Find and enrol in running, walking and cycling events across South Africa.</p>
-    <a class="btn btn-warning btn-lg me-2" asp-controller="Account" asp-action="Register">Register</a>
-    <a class="btn btn-outline-dark btn-lg" asp-controller="Account" asp-action="Login">Login</a>
-</div>
+
+<section class="home-hero">
+    <video class="home-hero-video" autoplay muted loop playsinline>
+        <source src="~/videos/hero.mp4" type="video/mp4" />
+    </video>
+    <div class="home-hero-overlay">
+        <span class="hero-pill">🇿🇦 South Africa's race day platform</span>
+        <h1>Find your next<br />finish line.</h1>
+        <p class="lead">Discover running, walking and cycling events near you, and enrol in seconds.</p>
+        <div class="d-flex gap-2 justify-content-center flex-wrap">
+            <a class="btn btn-warning btn-lg" asp-controller="Events" asp-action="Index">Browse events</a>
+            @if (!loggedIn)
+            {
+                <a class="btn btn-outline-light btn-lg" asp-controller="Account" asp-action="Register">Create account</a>
+            }
+            else
+            {
+                <a class="btn btn-outline-light btn-lg" asp-controller="Enrolments" asp-action="Index">My enrolments</a>
+            }
+        </div>
+    </div>
+</section>
+
+<section class="mt-5">
+    <h3 class="section-title">Choose your pace</h3>
+    <p class="text-muted mb-4">Three ways to get moving. Pick what suits you.</p>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <a class="type-tile tile-run" asp-controller="Events" asp-action="Index" asp-route-type="Run"
+               style="background-image:url('@Url.Content("~/images/run.jpg")'), linear-gradient(135deg,#0f172a,#2563eb)">
+                <div class="type-tile-text"><span>🏃</span><h4>Run</h4><small>5K, 10K, half marathons and more</small></div>
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a class="type-tile tile-walk" asp-controller="Events" asp-action="Index" asp-route-type="Walk"
+               style="background-image:url('@Url.Content("~/images/walk.jpg")'), linear-gradient(135deg,#064e3b,#10b981)">
+                <div class="type-tile-text"><span>🚶</span><h4>Walk</h4><small>Fun walks for every fitness level</small></div>
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a class="type-tile tile-cycle" asp-controller="Events" asp-action="Index" asp-route-type="Cycle"
+               style="background-image:url('@Url.Content("~/images/cycle.jpg")'), linear-gradient(135deg,#4c1d95,#f59e0b)">
+                <div class="type-tile-text"><span>🚴</span><h4>Cycle</h4><small>Road and trail rides across the country</small></div>
+            </a>
+        </div>
+    </div>
+</section>
+
+@if (Model.Any())
+{
+    <section class="mt-5">
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <div>
+                <h3 class="section-title mb-1">Featured events</h3>
+                <p class="text-muted mb-0">The next races on the calendar.</p>
+            </div>
+            <a asp-controller="Events" asp-action="Index" class="fw-semibold text-decoration-none">See all events &rarr;</a>
+        </div>
+        <div class="row g-4">
+            @foreach (var ev in Model)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="card event-card">
+                        <div class="event-banner banner-@ev.EventType.ToLower()"
+                             style="@(string.IsNullOrEmpty(ev.BannerImageUrl) ? "" : $"background-image:url('{ev.BannerImageUrl}')")">
+                            <span class="type-badge">@ev.EventType</span>
+                            @if (string.IsNullOrEmpty(ev.BannerImageUrl))
+                            {
+                                <span>@Icon(ev.EventType)</span>
+                            }
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="mb-2">@ev.Name</h5>
+                            <div class="meta mb-1">📅 @ev.EventDate.ToString("dd MMM yyyy, HH:mm")</div>
+                            <div class="meta mb-1">📍 @ev.Location</div>
+                            <div class="meta mb-3">📏 @ev.DistanceKm km</div>
+                            <a class="btn btn-dark mt-auto" asp-controller="Events" asp-action="Details" asp-route-id="@ev.EventId">View event</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </section>
+}
+
+<section class="mt-5">
+    <h3 class="section-title">How it works</h3>
+    <div class="row g-4 mt-1">
+        <div class="col-md-4">
+            <div class="card step-card">
+                <div class="card-body text-center">
+                    <div class="step-num">1</div>
+                    <h5>Find</h5>
+                    <p class="text-muted mb-0">Search events by name, location or type.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card step-card">
+                <div class="card-body text-center">
+                    <div class="step-num">2</div>
+                    <h5>Enrol</h5>
+                    <p class="text-muted mb-0">Pick your category and secure your spot.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card step-card">
+                <div class="card-body text-center">
+                    <div class="step-num">3</div>
+                    <h5>Race</h5>
+                    <p class="text-muted mb-0">Show up on race day and enjoy the finish.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="cta-banner mt-5">
+    <h3 class="mb-2">Ready to get on the start line?</h3>
+    <p class="mb-3 opacity-75">Join RaceDay and enrol in your first event today.</p>
+    <a class="btn btn-warning btn-lg" asp-controller="Events" asp-action="Index">See all events</a>
+</section>

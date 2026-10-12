@@ -13,7 +13,12 @@ builder.Services.AddSession(o =>
 builder.Services.AddHttpClient("RaceDayApi", c =>
 {
     c.BaseAddress = new Uri(builder.Configuration["ApiBaseUrl"]!);
+}).ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+{
+    UseCookies = false // we forward each user's API cookie ourselves
 });
+
+builder.Services.AddScoped<RaceDay.Web.Services.ApiClient>();
 
 var app = builder.Build();
 
