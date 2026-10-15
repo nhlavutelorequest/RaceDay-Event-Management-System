@@ -1,4 +1,4 @@
-# RaceDay-Event-Management-System
+# RaceDay Event Management System
 
 ### PROG6212 POE - Programming 2B
 
@@ -6,12 +6,25 @@ RaceDay is a full-stack, cloud-aware event management platform built for the Sou
 
 ---
 
-## The Roles
+## Table of Contents
+1. [User Roles](#user-roles)
+2. [Part 1 - System Planning and Database](#part-1---system-planning-and-database)
+3. [Part 2 - RESTful API Development](#part-2---restful-api-development)
+4. [Setup and Run Instructions](#setup-and-run-instructions)
+5. [Unit Tests](#unit-tests)
+6. [CI/CD](#cicd)
+7. [Video Walkthroughs](#video-walkthroughs)
+
+---
+
+## User Roles
 
 | Role | Capabilities |
 |---|---|
 | **Organiser** | Create, edit, and delete events; manage event categories; capture participant results; view all enrolments for their events. |
 | **Participant** | Register an account; browse events; enrol in an event by selecting a category; view their own enrolments; track their personal results. |
+
+Both roles can register, log in, and view and update their own profile.
 
 ---
 
@@ -19,35 +32,29 @@ RaceDay is a full-stack, cloud-aware event management platform built for the Sou
 
 All Part 1 planning documents are in the `/docs` folder:
 
-- `docs/ERD.pdf` - Entity Relationship Diagram for the full RaceDay data model (6 entities).
-- `docs/API_Endpoint_Plan.md` - Full endpoint plan covering Authentication, User Profile, Events, Categories, Event Enrolments, and Results.
-- `docs/RaceDay_Schema.sql` - SQL Server script that creates and seeds the RaceDay database. Tested in SQL Server Management Studio (SSMS).
-
-### Part 1 Video walkthrough
-**YouTube link:** https://youtu.be/fnTeI4-AHi4?si=Loz_87pzdS3DlO0j
-
-The video covers:
-- A walkthrough of the ERD and the reasoning behind the entity/relationship design
-- A walkthrough of the API endpoint plan
-- The SQL script executed live in SSMS
+| File | Description |
+|---|---|
+| `docs/ERD.pdf` | Entity Relationship Diagram for the full RaceDay data model (6 entities). |
+| `docs/API_Endpoint_Plan.md` | Endpoint plan covering Authentication, User Profile, Events, Categories, Event Enrolments, and Results. |
+| `docs/RaceDay_Schema.sql` | SQL Server script that creates and seeds the RaceDay database, tested in SSMS. |
 
 ---
 
 ## Part 2 - RESTful API Development
 
-Part 2 implements the API specified in the Part 1 endpoint plan, using ASP.NET Core Web API (.NET 9) and Entity Framework Core (Code-First) on SQL Server. An ASP.NET Core MVC web front end (`RaceDay.Web`) was also started; it consumes the API.
+Part 2 builds the RaceDay API exactly as specified in the Part 1 endpoint plan, using ASP.NET Core Web API (.NET 9) and Entity Framework Core (Code-First) on SQL Server. An ASP.NET Core MVC web application (`RaceDay.Web`) consumes the API.
 
-**Branch:** `feature/part2-api-development` and `feature/part2-web-ui` 
+**Branch:** `feature/part2-web-ui`
 
-### Tech stack
+### Tech Stack
 - ASP.NET Core Web API (.NET 9)
-- ASP.NET Core MVC web front end (`RaceDay.Web`) that consumes the API
-- Entity Framework Core 9.0.0 (SQL Server, Code-First with Migrations)
-- Swagger 
-- xUnit unit tests
-- GitHub Actions CI
+- ASP.NET Core MVC (`RaceDay.Web`)
+- Entity Framework Core 9.0.0, SQL Server, Code-First with Migrations
+- Swagger / Swashbuckle 6.9.0
+- xUnit for unit testing
+- GitHub Actions for CI
 
-### Solution structure
+### Solution Structure
 ```
 RaceDay.Api/             # Web API project (https://localhost:5001)
   Controllers/           # API endpoints
@@ -57,10 +64,10 @@ RaceDay.Api/             # Web API project (https://localhost:5001)
   Migrations/            # EF Core migrations
   Models/                # Role, User, Event, Category, Enrolment, Result
   Program.cs
-RaceDay.Web/             # MVC web front end (https://localhost:7035)
+RaceDay.Web/             # MVC web application (https://localhost:7035)
   Controllers/           # Page controllers
   Models/                # View models
-  Services/              # ApiClient - all calls to the API
+  Services/              # ApiClient - all communication with the API
   Views/                 # Razor views
   wwwroot/               # CSS, JS, static files
   Program.cs
@@ -69,68 +76,127 @@ RaceDay.Api.Tests/       # Unit tests
 docs/                    # Part 1 planning documents
 ```
 
-### What was implemented
-- **Database (Code-First):** Six entity models (`Role`, `User`, `Event`, `Category`, `Enrolment`, `Result`) with data annotations, foreign keys, and navigation properties. Roles use a separate lookup table rather than an enum, matching the Part 1 ERD. Schema is created through EF Core migrations.
-- **Authentication:** Users register with their personal details and choose a role (Organiser or Participant), then log in with their credentials. Passwords are hashed with `[hashing method, e.g. BCrypt / PBKDF2]` and never stored in plain text.
-- **Session management:** On login the user's ID and role are stored in the server session and used for all later requests.
-- **Role-based access:** A custom `SessionAuthorize` attribute blocks unauthenticated requests (401) and wrong-role requests (403). Organiser endpoints are not accessible to Participants and vice versa.
-- **Endpoints:** Authentication, User Profile, Events, Categories, Event Enrolments, and Results, as defined in `docs/API_Endpoint_Plan.md`.
-- **Swagger:** All endpoints are listed and testable at `/swagger`, each with a description, expected input, and responses.
-- **Unit tests:** Success and failure cases for registration and login, organiser event management, role rejection, and enrolment recording.
-- **Web front end (`RaceDay.Web`):** An ASP.NET Core MVC app that talks to the API only through an `ApiClient` service, with no database access or business logic of its own. Pages built so far:
-  - Register and login
-  - Event details page showing full event information and categories
-  - `[Enrol for an event by selecting a category - add once working]`
-  - `[Add any other pages: events list, my enrolments, my results, profile, organiser pages]`
-- **User-friendly errors:** The web app shows plain messages (e.g. "Password must be at least 8 characters long") and never raw API codes or JSON.
+### Features
 
-### Setup and run instructions
+**Database (Code-First)**
+- Six entities: `Role`, `User`, `Event`, `Category`, `Enrolment`, `Result`.
+- Data annotations, foreign keys, and navigation properties match the Part 1 ERD and SQL script.
+- Roles use a separate lookup table rather than an enum, as designed in Part 1.
+- The schema is created through EF Core migrations.
 
-**Prerequisites:** .NET 9 SDK, SQL Server (or SQL Server Express), Visual Studio 2022 or the `dotnet` CLI.
+**Authentication and Sessions**
+- Users register with their personal details and select a role (Organiser or Participant).
+- Passwords are securely hashed before storage and are never stored in plain text.
+- Login stores the user's ID and role in the server session, which maintains their authenticated state across requests.
+- Logging out ends the session.
 
-1. Set your SQL Server connection string in `RaceDay.Api/appsettings.json`:
+**Role-Based Access**
+- A custom `SessionAuthorize` filter protects all non-public endpoints.
+- Unauthenticated requests are rejected with `401 Unauthorized`.
+- Requests from the wrong role are rejected with `403 Forbidden`, so Organiser functionality is not accessible to Participants and vice versa.
+
+**API Endpoints** (as defined in `docs/API_Endpoint_Plan.md`)
+
+| Area | Functionality |
+|---|---|
+| Authentication | Register and log in. |
+| User Profile | Both roles can view and update their own profile. |
+| Events | Organisers create, update, and delete events (name, description, date, location, distance, event type: run, walk, or cycle). Both roles can view events. |
+| Categories | Organisers define age or distance categories for each event. Both roles can view them. |
+| Event Enrolments | Participants enrol by selecting a category. Organisers view all enrolments for their events. |
+| Results | Organisers capture finish times and finishing positions. Participants view their own results. |
+
+**Swagger**
+- Every endpoint is listed and can be tested in the browser at `/swagger`, with its purpose, expected input, and responses documented.
+
+**Web Application (`RaceDay.Web`)**
+- Communicates with the API only through the `ApiClient` service, with no direct database access or duplicated business logic.
+- Register and login pages, with session-based authentication.
+- Event browsing and an event details page showing full event information and available categories.
+- Participants can enrol in an event by selecting a category.
+- Plain, friendly validation and error messages are shown to users instead of raw API codes or JSON.
+
+---
+
+## Setup and Run Instructions
+
+**Prerequisites:** .NET 9 SDK, SQL Server (or SQL Server Express), and Visual Studio 2022 or the `dotnet` CLI.
+
+1. **Clone the repository**
+```bash
+   git clone <repository-url>
+   cd <repository-folder>
+   git checkout feature/part2-web-ui
+```
+
+2. **Configure the database connection** in `RaceDay.Api/appsettings.json`:
 ```json
    "ConnectionStrings": {
      "DefaultConnection": "Server=localhost;Database=RaceDayDb;Trusted_Connection=True;TrustServerCertificate=True;"
    }
 ```
-2. Create the database from the migrations:
+
+3. **Create the database** from the EF Core migrations:
 ```bash
    cd RaceDay.Api
    dotnet ef database update
 ```
-3. Run both projects together. In Visual Studio, right-click the solution → **Configure Startup Projects** → **Multiple startup projects** → set `RaceDay.Api` and `RaceDay.Web` to **Start**, then press F5.
 
-   Or from two terminals:
+4. **Run the API and the web application together.**
+
+   *Visual Studio:* right-click the solution → **Configure Startup Projects** → **Multiple startup projects** → set both `RaceDay.Api` and `RaceDay.Web` to **Start**, then press **F5**.
+
+   *Command line (two terminals):*
 ```bash
    dotnet run --project RaceDay.Api
    dotnet run --project RaceDay.Web
 ```
-4. Open:
-   - Swagger (API): `https://localhost:5001/swagger`
-   - Web app: `https://localhost:7035`
 
-The API must be running for the web app to work.
+5. **Open the applications**
 
-### Running the unit tests
+   | Application | URL |
+   |---|---|
+   | Swagger (API) | https://localhost:5001/swagger |
+   | Web application | https://localhost:7035 |
+
+---
+
+## Unit Tests
+
+Unit tests cover both success and failure scenarios for:
+- User registration and login
+- Event management by Organisers
+- Rejection of unauthenticated requests and of requests from the wrong role
+- Participant enrolment and correct recording of the enrolment
+
+Run all tests:
 ```bash
 dotnet test
 ```
 
-### CI/CD
+---
+
+## CI/CD
+
 A GitHub Actions workflow in `.github/workflows/` builds the solution and runs all unit tests on every push.
 
-**CI/CD green build screenshot (Part 2):**
+**Green build screenshot:**
 
-`[paste the new Part 2 green build screenshot here]`
+<!-- Paste the screenshot here -->
 
-### Part 2 Video walkthrough
-**YouTube link:** `[unlisted YouTube link]`
+---
 
-The video covers:
+## Video Walkthroughs
+
+| Part | Link |
+|---|---|
+| Part 1 - Planning and Database | https://youtu.be/fnTeI4-AHi4?si=Loz_87pzdS3DlO0j |
+| Part 2 - RESTful API | <!-- paste unlisted YouTube link --> |
+
+**Part 2 video covers:**
 - The running API demonstrated through Swagger
-- The web front end calling the API (register, login, browse events, event details)
-- Code structure (models, DbContext, controllers, DTOs, filters, ApiClient)
+- The web application consuming the API
+- Code structure: models, DbContext, controllers, DTOs, filters, and ApiClient
 - Endpoints and how they match the Part 1 plan
 - Authentication, session management, and role-based access
 - Unit tests, run locally
