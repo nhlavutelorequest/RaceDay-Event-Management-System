@@ -35,26 +35,34 @@ The video covers:
 
 ## Part 2 - RESTful API Development
 
-Part 2 implements the API specified in the Part 1 endpoint plan, using ASP.NET Core Web API (.NET 9) and Entity Framework Core (Code-First) on SQL Server.
+Part 2 implements the API specified in the Part 1 endpoint plan, using ASP.NET Core Web API (.NET 9) and Entity Framework Core (Code-First) on SQL Server. An ASP.NET Core MVC web front end (`RaceDay.Web`) was also started; it consumes the API.
 
-**Branch:** `[feature/part2-api-development]`
+**Branch:** `feature/part2-api-development` and `feature/part2-web-ui` 
 
 ### Tech stack
 - ASP.NET Core Web API (.NET 9)
+- ASP.NET Core MVC web front end (`RaceDay.Web`) that consumes the API
 - Entity Framework Core 9.0.0 (SQL Server, Code-First with Migrations)
-- Swagger / Swashbuckle (6.9.0)
+- Swagger 
 - xUnit unit tests
 - GitHub Actions CI
 
 ### Solution structure
 ```
-RaceDay.Api/             # Web API project
+RaceDay.Api/             # Web API project (https://localhost:5001)
   Controllers/           # API endpoints
   Data/                  # RaceDayDbContext
   DTOs/                  # Request/response models
   Filters/               # SessionAuthorize role-based access filter
   Migrations/            # EF Core migrations
   Models/                # Role, User, Event, Category, Enrolment, Result
+  Program.cs
+RaceDay.Web/             # MVC web front end (https://localhost:7035)
+  Controllers/           # Page controllers
+  Models/                # View models
+  Services/              # ApiClient - all calls to the API
+  Views/                 # Razor views
+  wwwroot/               # CSS, JS, static files
   Program.cs
 RaceDay.Api.Tests/       # Unit tests
   Helpers/               # FakeSession, TestDbContextFactory
@@ -66,9 +74,15 @@ docs/                    # Part 1 planning documents
 - **Authentication:** Users register with their personal details and choose a role (Organiser or Participant), then log in with their credentials. Passwords are hashed with `[hashing method, e.g. BCrypt / PBKDF2]` and never stored in plain text.
 - **Session management:** On login the user's ID and role are stored in the server session and used for all later requests.
 - **Role-based access:** A custom `SessionAuthorize` attribute blocks unauthenticated requests (401) and wrong-role requests (403). Organiser endpoints are not accessible to Participants and vice versa.
-- **Endpoints:** Authentication, User Profile, Events, Categories, Event Enrolments, and Results, as defined in `docs/API_Endpoint_Plan.md`. 
+- **Endpoints:** Authentication, User Profile, Events, Categories, Event Enrolments, and Results, as defined in `docs/API_Endpoint_Plan.md`.
 - **Swagger:** All endpoints are listed and testable at `/swagger`, each with a description, expected input, and responses.
 - **Unit tests:** Success and failure cases for registration and login, organiser event management, role rejection, and enrolment recording.
+- **Web front end (`RaceDay.Web`):** An ASP.NET Core MVC app that talks to the API only through an `ApiClient` service, with no database access or business logic of its own. Pages built so far:
+  - Register and login
+  - Event details page showing full event information and categories
+  - `[Enrol for an event by selecting a category - add once working]`
+  - `[Add any other pages: events list, my enrolments, my results, profile, organiser pages]`
+- **User-friendly errors:** The web app shows plain messages (e.g. "Password must be at least 8 characters long") and never raw API codes or JSON.
 
 ### Setup and run instructions
 
@@ -85,11 +99,18 @@ docs/                    # Part 1 planning documents
    cd RaceDay.Api
    dotnet ef database update
 ```
-3. Run the API:
+3. Run both projects together. In Visual Studio, right-click the solution → **Configure Startup Projects** → **Multiple startup projects** → set `RaceDay.Api` and `RaceDay.Web` to **Start**, then press F5.
+
+   Or from two terminals:
 ```bash
-   dotnet run
+   dotnet run --project RaceDay.Api
+   dotnet run --project RaceDay.Web
 ```
-4. Open Swagger at `https://localhost:5001/swagger`.
+4. Open:
+   - Swagger (API): `https://localhost:5001/swagger`
+   - Web app: `https://localhost:7035`
+
+The API must be running for the web app to work.
 
 ### Running the unit tests
 ```bash
@@ -108,7 +129,8 @@ A GitHub Actions workflow in `.github/workflows/` builds the solution and runs a
 
 The video covers:
 - The running API demonstrated through Swagger
-- Code structure (models, DbContext, controllers, DTOs, filters)
+- The web front end calling the API (register, login, browse events, event details)
+- Code structure (models, DbContext, controllers, DTOs, filters, ApiClient)
 - Endpoints and how they match the Part 1 plan
 - Authentication, session management, and role-based access
 - Unit tests, run locally
