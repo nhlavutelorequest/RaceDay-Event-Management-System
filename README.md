@@ -50,7 +50,7 @@ Part 2 builds the RaceDay API exactly as specified in the Part 1 endpoint plan, 
 - ASP.NET Core Web API (.NET 9)
 - ASP.NET Core MVC (`RaceDay.Web`)
 - Entity Framework Core 9.0.0, SQL Server, Code-First with Migrations
-- Swagger / Swashbuckle 6.9.0
+- Swagger 
 - xUnit for unit testing
 - GitHub Actions for CI
 
