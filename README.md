@@ -182,7 +182,8 @@ A GitHub Actions workflow in `.github/workflows/` builds the solution and runs a
 
 **Green build screenshot:**
 
-<!-- Paste the screenshot here -->
+<!-- <img width="1365" height="574" alt="image" src="https://github.com/user-attachments/assets/54b6e4c7-5212-4dda-9000-9a2f828d833c" />
+ -->
 
 ---
 
