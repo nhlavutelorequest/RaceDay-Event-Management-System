@@ -16,7 +16,10 @@ namespace RaceDay.Web.Models
         [Required]
         public string Role { get; set; } = "Participant";
 
-        [Required, MinLength(6)]
+        [Required(ErrorMessage = "Password is required.")]
+        [MinLength(8, ErrorMessage = "Password must be at least 8 characters long.")]
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$",
+            ErrorMessage = "Password needs an uppercase letter, a lowercase letter, a number and a special character.")]
         [DataType(DataType.Password)]
         public string Password { get; set; } = "";
 

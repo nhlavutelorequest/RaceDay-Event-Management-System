@@ -33,8 +33,8 @@ namespace RaceDay.Web.Controllers
                 return RedirectToAction(nameof(Login));
             }
 
-            var body = await res.Content.ReadAsStringAsync();
-            ModelState.AddModelError("", $"Registration failed. API returned {(int)res.StatusCode}: {body}");
+            var message = await ApiClient.ReadMessageAsync(res, "Registration failed. Please check your details and try again.");
+            ModelState.AddModelError("", message);
             return View(vm);
         }
 
@@ -50,8 +50,8 @@ namespace RaceDay.Web.Controllers
 
             if (!res.IsSuccessStatusCode)
             {
-                var body = await res.Content.ReadAsStringAsync();
-                ModelState.AddModelError("", $"Login failed. API returned {(int)res.StatusCode}: {body}");
+                var message = await ApiClient.ReadMessageAsync(res, "Login failed. Please try again.");
+                ModelState.AddModelError("", message);
                 return View(vm);
             }
 
