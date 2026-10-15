@@ -1,4 +1,5 @@
 ﻿using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace RaceDay.Web.Services
 {
@@ -49,12 +50,27 @@ namespace RaceDay.Web.Services
             return res;
         }
 
+        // Turns an API error response into a plain sentence a user can understand.
         public static async Task<string> ReadMessageAsync(HttpResponseMessage res, string fallback)
         {
             try
             {
-                var json = await res.Content.ReadFromJsonAsync<System.Text.Json.JsonElement>();
-                if (json.TryGetProperty("message", out var m)) return m.GetString() ?? fallback;
+                var json = await res.Content.ReadFromJsonAsync<JsonElement>();
+
+                if (json.TryGetProperty("message", out var m) && !string.IsNullOrWhiteSpace(m.GetString()))
+                    return m.GetString()!;
+
+                if (json.TryGetProperty("errors", out var errors) && errors.ValueKind == JsonValueKind.Object)
+                {
+                    var messages = errors.EnumerateObject()
+                        .SelectMany(p => p.Value.EnumerateArray())
+                        .Select(e => e.GetString())
+                        .Where(s => !string.IsNullOrWhiteSpace(s))
+                        .Distinct();
+
+                    var joined = string.Join(" ", messages);
+                    if (joined.Length > 0) return joined;
+                }
             }
             catch { }
             return fallback;

@@ -28,6 +28,12 @@ namespace RaceDay.Api.Controllers
                 return BadRequest(new { message = "Role must be either 'Organiser' or 'Participant'." });
             }
 
+            var passwordError = PasswordPolicy.Validate(dto.Password, dto.Email);
+            if (passwordError != null)
+            {
+                return BadRequest(new { message = passwordError });
+            }
+
             var emailExists = await _context.Users.AnyAsync(u => u.Email == dto.Email);
             if (emailExists)
             {

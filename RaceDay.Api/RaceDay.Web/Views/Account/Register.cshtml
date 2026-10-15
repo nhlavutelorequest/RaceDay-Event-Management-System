@@ -3,6 +3,23 @@
     ViewData["Title"] = "Register";
 }
 
+<style>
+    .pw-wrap { position: relative; }
+    .pw-toggle {
+        position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+        border: none; background: none; cursor: pointer; font-size: 1.1rem; padding: 0 .25rem;
+    }
+    .pw-meter { height: 8px; background: #e2e8f0; border-radius: 999px; overflow: hidden; margin-top: .6rem; }
+    .pw-meter-bar { height: 100%; width: 0; border-radius: 999px; transition: width .25s, background .25s; }
+    .pw-label { font-size: .85rem; font-weight: 700; margin-top: .35rem; }
+    .pw-rules { list-style: none; padding: 0; margin: .6rem 0 0; font-size: .88rem; }
+    .pw-rules li { color: #94a3b8; padding: .1rem 0; transition: color .2s; }
+    .pw-rules li.ok { color: #059669; font-weight: 600; }
+    .pw-rules li::before { content: "○ "; }
+    .pw-rules li.ok::before { content: "✔ "; }
+    .pw-match { font-size: .85rem; font-weight: 600; margin-top: .35rem; }
+</style>
+
 <div class="row justify-content-center py-4">
     <div class="col-md-8 col-lg-6">
         <div class="card auth-card">
@@ -38,19 +55,36 @@
                                 <option value="Organiser">Organiser (I want to host events)</option>
                             </select>
                         </div>
-                        <div class="col-md-6">
+
+                        <div class="col-12">
                             <label asp-for="Password" class="form-label"></label>
-                            <input asp-for="Password" class="form-control" />
+                            <div class="pw-wrap">
+                                <input asp-for="Password" id="pw" class="form-control" autocomplete="new-password" />
+                                <button type="button" class="pw-toggle" id="pwToggle" title="Show or hide password">👁</button>
+                            </div>
                             <span asp-validation-for="Password" class="text-danger small"></span>
+
+                            <div class="pw-meter"><div class="pw-meter-bar" id="pwBar"></div></div>
+                            <div class="pw-label" id="pwLabel">Enter a password</div>
+
+                            <ul class="pw-rules">
+                                <li id="r-len">At least 8 characters</li>
+                                <li id="r-up">One uppercase letter (A-Z)</li>
+                                <li id="r-low">One lowercase letter (a-z)</li>
+                                <li id="r-num">One number (0-9)</li>
+                                <li id="r-spec">One special character (! @@ # $ %)</li>
+                            </ul>
                         </div>
-                        <div class="col-md-6">
+
+                        <div class="col-12">
                             <label asp-for="ConfirmPassword" class="form-label"></label>
-                            <input asp-for="ConfirmPassword" class="form-control" />
+                            <input asp-for="ConfirmPassword" id="pw2" class="form-control" autocomplete="new-password" />
                             <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                            <div class="pw-match" id="pwMatch"></div>
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-warning w-100 mt-4">Create account</button>
+                    <button type="submit" id="submitBtn" class="btn btn-warning w-100 mt-4" disabled>Create account</button>
                 </form>
                 <p class="text-center mt-3 mb-0 text-muted">
                     Already have an account? <a asp-action="Login">Login</a>
@@ -62,4 +96,61 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function () {
+            const pw = document.getElementById('pw');
+            const pw2 = document.getElementById('pw2');
+            const bar = document.getElementById('pwBar');
+            const label = document.getElementById('pwLabel');
+            const match = document.getElementById('pwMatch');
+            const btn = document.getElementById('submitBtn');
+            const toggle = document.getElementById('pwToggle');
+
+            const rules = {
+                'r-len': v => v.length >= 8,
+                'r-up': v => /[A-Z]/.test(v),
+                'r-low': v => /[a-z]/.test(v),
+                'r-num': v => /[0-9]/.test(v),
+                'r-spec': v => /[^A-Za-z0-9]/.test(v)
+            };
+
+            function update() {
+                const v = pw.value;
+                let passed = 0;
+                for (const id in rules) {
+                    const ok = rules[id](v);
+                    document.getElementById(id).classList.toggle('ok', ok);
+                    if (ok) passed++;
+                }
+
+                let color = '#e2e8f0', text = 'Enter a password';
+                if (v.length > 0) {
+                    if (passed <= 2) { color = '#dc2626'; text = 'Weak'; }
+                    else if (passed < 5) { color = '#f59e0b'; text = 'Fair'; }
+                    else { color = '#059669'; text = 'Strong'; }
+                }
+                bar.style.width = (passed / 5 * 100) + '%';
+                bar.style.background = color;
+                label.textContent = text;
+                label.style.color = color === '#e2e8f0' ? '#64748b' : color;
+
+                const matches = v.length > 0 && v === pw2.value;
+                if (pw2.value.length === 0) { match.textContent = ''; }
+                else if (matches) { match.textContent = '✔ Passwords match'; match.style.color = '#059669'; }
+                else { match.textContent = '✖ Passwords do not match'; match.style.color = '#dc2626'; }
+
+                btn.disabled = !(passed === 5 && matches);
+            }
+
+            toggle.addEventListener('click', function () {
+                const show = pw.type === 'password';
+                pw.type = show ? 'text' : 'password';
+                pw2.type = show ? 'text' : 'password';
+            });
+
+            pw.addEventListener('input', update);
+            pw2.addEventListener('input', update);
+            update();
+        })();
+    </script>
 }
