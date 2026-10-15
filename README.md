@@ -124,9 +124,9 @@ docs/                    # Part 1 planning documents
 
 1. **Clone the repository**
 ```bash
-   git clone (https://github.com/nhlavutelorequest/RaceDay-Event-Management-System.git)>
-   cd < RaceDay-Event-Management-System>
-   git checkout feature/part2-web-ui
+git clone https:(https://github.com/nhlavutelorequest/RaceDay-Event-Management-System.git)
+cd RaceDay-Event-Management-System
+git checkout feature/part2-web-ui
 ```
 
 2. **Configure the database connection** in `RaceDay.Api/appsettings.json`:
