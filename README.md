@@ -37,7 +37,7 @@ The video covers:
 
 Part 2 implements the API specified in the Part 1 endpoint plan, using ASP.NET Core Web API (.NET 9) and Entity Framework Core (Code-First) on SQL Server.
 
-**Branch:** `[part2 branch name]`
+**Branch:** `[feature/part2-api-development]`
 
 ### Tech stack
 - ASP.NET Core Web API (.NET 9)
@@ -66,7 +66,7 @@ docs/                    # Part 1 planning documents
 - **Authentication:** Users register with their personal details and choose a role (Organiser or Participant), then log in with their credentials. Passwords are hashed with `[hashing method, e.g. BCrypt / PBKDF2]` and never stored in plain text.
 - **Session management:** On login the user's ID and role are stored in the server session and used for all later requests.
 - **Role-based access:** A custom `SessionAuthorize` attribute blocks unauthenticated requests (401) and wrong-role requests (403). Organiser endpoints are not accessible to Participants and vice versa.
-- **Endpoints:** Authentication, User Profile, Events, Categories, Event Enrolments, and Results, as defined in `docs/API_Endpoint_Plan.md`. `[Note any deviations from the plan here, or write "No deviations."]`
+- **Endpoints:** Authentication, User Profile, Events, Categories, Event Enrolments, and Results, as defined in `docs/API_Endpoint_Plan.md`. 
 - **Swagger:** All endpoints are listed and testable at `/swagger`, each with a description, expected input, and responses.
 - **Unit tests:** Success and failure cases for registration and login, organiser event management, role rejection, and enrolment recording.
 
@@ -74,28 +74,22 @@ docs/                    # Part 1 planning documents
 
 **Prerequisites:** .NET 9 SDK, SQL Server (or SQL Server Express), Visual Studio 2022 or the `dotnet` CLI.
 
-1. Clone the repository and switch to the Part 2 branch:
-```bash
-   git clone [repo url]
-   cd [repo folder]
-   git checkout [part2 branch name]
-```
-2. Set your SQL Server connection string in `RaceDay.Api/appsettings.json`:
+1. Set your SQL Server connection string in `RaceDay.Api/appsettings.json`:
 ```json
    "ConnectionStrings": {
      "DefaultConnection": "Server=localhost;Database=RaceDayDb;Trusted_Connection=True;TrustServerCertificate=True;"
    }
 ```
-3. Create the database from the migrations:
+2. Create the database from the migrations:
 ```bash
    cd RaceDay.Api
    dotnet ef database update
 ```
-4. Run the API:
+3. Run the API:
 ```bash
    dotnet run
 ```
-5. Open Swagger at `https://localhost:5001/swagger`.
+4. Open Swagger at `https://localhost:5001/swagger`.
 
 ### Running the unit tests
 ```bash
