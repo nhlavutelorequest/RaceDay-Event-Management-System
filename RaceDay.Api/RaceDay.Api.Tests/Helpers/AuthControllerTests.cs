@@ -9,6 +9,8 @@ namespace RaceDay.Api.Tests
 {
     public class AuthControllerTests
     {
+        private const string ValidPassword = "Rd#Test2026!x";
+
         private static AuthController CreateController(Data.RaceDayDbContext context)
         {
             var controller = new AuthController(context);
@@ -28,7 +30,7 @@ namespace RaceDay.Api.Tests
             {
                 FullName = "Jane Organiser",
                 Email = "jane@raceday.co.za",
-                Password = "Password1!",
+                Password = ValidPassword,
                 Role = "Organiser"
             };
 
@@ -42,7 +44,7 @@ namespace RaceDay.Api.Tests
         {
             var context = TestDbContextFactory.Create();
             var controller = CreateController(context);
-            var dto = new RegisterDto { FullName = "A", Email = "dup@raceday.co.za", Password = "Password1!", Role = "Participant" };
+            var dto = new RegisterDto { FullName = "A", Email = "dup@raceday.co.za", Password = ValidPassword, Role = "Participant" };
 
             await controller.Register(dto);
             var secondResult = await controller.Register(dto);
@@ -55,10 +57,10 @@ namespace RaceDay.Api.Tests
         {
             var context = TestDbContextFactory.Create();
             var controller = CreateController(context);
-            var registerDto = new RegisterDto { FullName = "Login Test", Email = "login@raceday.co.za", Password = "Password1!", Role = "Participant" };
+            var registerDto = new RegisterDto { FullName = "Login Test", Email = "login@raceday.co.za", Password = ValidPassword, Role = "Participant" };
             await controller.Register(registerDto);
 
-            var loginResult = await controller.Login(new LoginDto { Email = "login@raceday.co.za", Password = "Password1!" });
+            var loginResult = await controller.Login(new LoginDto { Email = "login@raceday.co.za", Password = ValidPassword });
 
             Assert.IsType<OkObjectResult>(loginResult);
         }
@@ -68,7 +70,7 @@ namespace RaceDay.Api.Tests
         {
             var context = TestDbContextFactory.Create();
             var controller = CreateController(context);
-            var registerDto = new RegisterDto { FullName = "Wrong Pw", Email = "wrongpw@raceday.co.za", Password = "Password1!", Role = "Participant" };
+            var registerDto = new RegisterDto { FullName = "Wrong Pw", Email = "wrongpw@raceday.co.za", Password = ValidPassword, Role = "Participant" };
             await controller.Register(registerDto);
 
             var loginResult = await controller.Login(new LoginDto { Email = "wrongpw@raceday.co.za", Password = "WrongPassword!" });
