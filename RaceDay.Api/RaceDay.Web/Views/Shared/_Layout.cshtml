@@ -25,6 +25,11 @@
                     <ul class="navbar-nav me-auto">
                         <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Index">Home</a></li>
                         <li class="nav-item"><a class="nav-link" asp-controller="Events" asp-action="Index">Events</a></li>
+                        @if (!string.IsNullOrEmpty(userName) && isOrganiser)
+                        {
+                            <li class="nav-item"><a class="nav-link" asp-controller="Organiser" asp-action="Dashboard">Dashboard</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-controller="ManageEvents" asp-action="Index">Manage Events</a></li>
+                        }
                     </ul>
                     <ul class="navbar-nav">
                         @if (string.IsNullOrEmpty(userName))

@@ -1,0 +1,99 @@
+﻿@model List<RaceDay.Web.Models.MyEventItem>
+@{
+    ViewData["Title"] = "Organiser Dashboard";
+    var now = DateTime.Now;
+    var upcomingCount = Model.Count(e => e.EventDate >= now);
+    var totalEnrolments = Model.Sum(e => e.EnrolmentCount);
+    var ordered = Model.OrderByDescending(e => e.EventDate >= now).ThenBy(e => e.EventDate).ToList();
+}
+
+<div class="page-header">
+    <h2 class="mb-1">Organiser Dashboard</h2>
+    <p class="mb-3 opacity-75">A summary of the events you've created.</p>
+    <a asp-controller="ManageEvents" asp-action="Create" class="btn btn-warning">+ Create event</a>
+</div>
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">⚠️ @ViewBag.Error</div>
+}
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <div class="display-6 fw-bold">@Model.Count</div>
+                <div class="meta">Total events</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <div class="display-6 fw-bold">@upcomingCount</div>
+                <div class="meta">Upcoming events</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <div class="display-6 fw-bold">@totalEnrolments</div>
+                <div class="meta">Total enrolments</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="card">
+        <div class="card-body text-center text-muted py-5">
+            You haven't created any events yet.<br />
+            <a asp-controller="ManageEvents" asp-action="Create" class="btn btn-warning mt-3">Create your first event</a>
+        </div>
+    </div>
+}
+else
+{
+    <div class="card">
+        <div class="card-body">
+            <h5 class="mb-3">Your events</h5>
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Event</th>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th class="text-center">Enrolments</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var e in ordered)
+                        {
+                            <tr>
+                                <td><strong>@e.Name</strong><div class="meta small">📍 @e.Location</div></td>
+                                <td>@e.EventDate.ToString("dd MMM yyyy, HH:mm")</td>
+                                <td><span class="type-badge static">@e.EventType</span></td>
+                                <td class="text-center"><strong>@e.EnrolmentCount</strong></td>
+                                <td>
+                                    @if (e.EventDate >= now)
+                                    {
+                                        <span class="status-badge status-confirmed">Upcoming</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-badge bg-light text-dark border">Completed</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <a asp-controller="ManageEvents" asp-action="Index" class="btn btn-dark mt-3">Manage events</a>
+        </div>
+    </div>
+}

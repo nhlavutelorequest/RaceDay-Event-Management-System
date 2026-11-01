@@ -1,0 +1,73 @@
+﻿@model List<RaceDay.Web.Models.MyEventItem>
+@{
+    ViewData["Title"] = "Manage Events";
+}
+
+<div class="page-header">
+    <h2 class="mb-1">Manage Events</h2>
+    <p class="mb-3 opacity-75">Create, edit and delete your events.</p>
+    <a asp-action="Create" class="btn btn-warning">+ Create event</a>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">✅ @TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">⚠️ @TempData["Error"]</div>
+}
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">⚠️ @ViewBag.Error</div>
+}
+
+@if (!Model.Any())
+{
+    <div class="card">
+        <div class="card-body text-center text-muted py-5">
+            You haven't created any events yet.<br />
+            <a asp-action="Create" class="btn btn-warning mt-3">Create your first event</a>
+        </div>
+    </div>
+}
+else
+{
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Event</th>
+                            <th>Date</th>
+                            <th>Distance</th>
+                            <th>Type</th>
+                            <th class="text-center">Enrolments</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var e in Model)
+                        {
+                            <tr>
+                                <td><strong>@e.Name</strong><div class="meta small">📍 @e.Location</div></td>
+                                <td>@e.EventDate.ToString("dd MMM yyyy, HH:mm")</td>
+                                <td>@e.DistanceKm.ToString("0.00") km</td>
+                                <td><span class="type-badge static">@e.EventType</span></td>
+                                <td class="text-center">@e.EnrolmentCount</td>
+                                <td class="text-end">
+                                    <a asp-action="Edit" asp-route-id="@e.EventId" class="btn btn-outline-dark btn-sm">Edit</a>
+                                    <form asp-action="Delete" asp-route-id="@e.EventId" method="post" class="d-inline"
+                                          onsubmit="return confirm('Delete this event? This cannot be undone.');">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
