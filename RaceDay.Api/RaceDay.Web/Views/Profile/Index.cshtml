@@ -1,0 +1,57 @@
+﻿@model RaceDay.Web.Controllers.ProfileVm
+@{
+    ViewData["Title"] = "My Profile";
+    var initial = string.IsNullOrWhiteSpace(Model.FullName) ? "?" : Model.FullName.Trim()[0].ToString().ToUpper();
+}
+
+<div class="page-header">
+    <h2 class="mb-1">My Profile</h2>
+    <p class="mb-0 opacity-75">View and update your personal information.</p>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">✅ @TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">⚠️ @TempData["Error"]</div>
+}
+
+<div class="card">
+    <div class="card-body">
+        <div class="d-flex align-items-center mb-4">
+            <div class="step-num mb-0 me-3">@initial</div>
+            <div>
+                <h5 class="mb-0">@Model.FullName</h5>
+                <span class="meta">@Model.Role</span>
+            </div>
+        </div>
+
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+        <form asp-action="Index" method="post">
+            <input type="hidden" asp-for="Email" />
+            <input type="hidden" asp-for="Role" />
+
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input class="form-control" value="@Model.Email" disabled />
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="FullName" class="form-label">Full name</label>
+                <input asp-for="FullName" class="form-control" />
+                <span asp-validation-for="FullName" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="PhoneNumber" class="form-label">Phone number</label>
+                <input asp-for="PhoneNumber" class="form-control" />
+                <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+            </div>
+
+            <button type="submit" class="btn btn-warning">Save changes</button>
+        </form>
+    </div>
+</div>
