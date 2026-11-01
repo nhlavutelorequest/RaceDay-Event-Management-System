@@ -56,12 +56,17 @@ else
                                 <td>@e.DistanceKm.ToString("0.00") km</td>
                                 <td><span class="type-badge static">@e.EventType</span></td>
                                 <td class="text-center">@e.EnrolmentCount</td>
-                                <td class="text-end">
-                                    <a asp-action="Edit" asp-route-id="@e.EventId" class="btn btn-outline-dark btn-sm">Edit</a>
-                                    <form asp-action="Delete" asp-route-id="@e.EventId" method="post" class="d-inline"
-                                          onsubmit="return confirm('Delete this event? This cannot be undone.');">
-                                        <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
-                                    </form>
+                                <td>
+                                    <div class="d-flex flex-wrap gap-1 justify-content-end">
+                                        <a asp-controller="Organiser" asp-action="Categories" asp-route-eventId="@e.EventId" class="btn btn-dark btn-sm">Categories</a>
+                                        <a asp-controller="Organiser" asp-action="Enrolments" asp-route-eventId="@e.EventId" class="btn btn-dark btn-sm">Enrolments</a>
+                                        <a asp-controller="Organiser" asp-action="Results" asp-route-eventId="@e.EventId" class="btn btn-dark btn-sm">Results</a>
+                                        <a asp-action="Edit" asp-route-id="@e.EventId" class="btn btn-outline-dark btn-sm">Edit</a>
+                                        <form asp-action="Delete" asp-route-id="@e.EventId" method="post" class="d-inline"
+                                              onsubmit="return confirm('Delete this event? This cannot be undone.');">
+                                            <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         }

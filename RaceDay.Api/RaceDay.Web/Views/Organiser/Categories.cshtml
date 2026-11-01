@@ -1,0 +1,93 @@
+﻿@model RaceDay.Web.Models.EventDetails
+@{
+    ViewData["Title"] = "Categories";
+}
+
+<div class="page-header">
+    <h2 class="mb-1">Categories</h2>
+    <p class="mb-3 opacity-75">@Model.Name</p>
+    <a asp-controller="ManageEvents" asp-action="Index" class="btn btn-outline-light btn-sm">← Back to events</a>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">✅ @TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">⚠️ @TempData["Error"]</div>
+}
+
+<div class="row g-3">
+    <div class="col-lg-5">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="mb-3">Add a category</h5>
+                <form asp-action="AddCategory" method="post">
+                    <input type="hidden" name="eventId" value="@Model.EventId" />
+
+                    <div class="mb-3">
+                        <label class="form-label" for="categoryName">Category name</label>
+                        <input id="categoryName" name="categoryName" class="form-control" maxlength="50"
+                               list="categorySuggestions" placeholder="e.g. Under 20, Senior, 10km" required />
+                        <datalist id="categorySuggestions">
+                            <option value="Under 20"></option>
+                            <option value="Senior"></option>
+                            <option value="Master"></option>
+                            <option value="5km"></option>
+                            <option value="10km"></option>
+                            <option value="21km"></option>
+                        </datalist>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="description">Description (optional)</label>
+                        <input id="description" name="description" class="form-control" maxlength="200" />
+                    </div>
+
+                    <button type="submit" class="btn btn-warning">Add category</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="mb-3">Categories for this event</h5>
+
+                @if (!Model.Categories.Any())
+                {
+                    <p class="text-muted mb-0">No categories yet. Participants can't enrol until you add at least one.</p>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table align-middle mb-0">
+                            <thead>
+                                <tr><th>Name</th><th>Description</th><th class="text-end">Action</th></tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var c in Model.Categories)
+                                {
+                                    <tr>
+                                        <td><strong>@c.CategoryName</strong></td>
+                                        <td class="meta">@(string.IsNullOrWhiteSpace(c.Description) ? "—" : c.Description)</td>
+                                        <td class="text-end">
+                                            <form asp-action="DeleteCategory" method="post" class="d-inline"
+                                                  onsubmit="return confirm('Remove this category?');">
+                                                <input type="hidden" name="eventId" value="@Model.EventId" />
+                                                <input type="hidden" name="id" value="@c.CategoryId" />
+                                                <button type="submit" class="btn btn-outline-danger btn-sm">Remove</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

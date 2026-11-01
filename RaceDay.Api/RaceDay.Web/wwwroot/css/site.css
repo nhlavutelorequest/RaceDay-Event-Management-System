@@ -470,3 +470,21 @@ footer {
     color: #991b1b;
     border: 1.5px solid #ef4444;
 }
+
+.status-confirmed {
+    background: #dcfce7;
+    color: #166534;
+    border: 1.5px solid #22c55e;
+}
+
+.status-pending {
+    background: #fef3c7;
+    color: #92400e;
+    border: 1.5px solid #f59e0b;
+}
+
+.status-cancelled {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1.5px solid #ef4444;
+}

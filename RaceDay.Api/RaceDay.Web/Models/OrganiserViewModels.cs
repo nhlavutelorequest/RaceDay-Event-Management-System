@@ -32,4 +32,23 @@ namespace RaceDay.Web.Models
         // Kept so editing an event never wipes its banner
         public string? BannerImageUrl { get; set; }
     }
+
+    public class EnrolmentRow
+    {
+        public int EnrolmentId { get; set; }
+        public string ParticipantName { get; set; } = "";
+        public string CategoryName { get; set; } = "";
+        public string Status { get; set; } = "";
+        public DateTime EnrolledAt { get; set; }
+        public bool HasResult { get; set; }
+        public string? FinishTime { get; set; }
+        public int? FinishPosition { get; set; }
+    }
+
+    public class OrgEnrolmentsVm
+    {
+        public int EventId { get; set; }
+        public string EventName { get; set; } = "";
+        public List<EnrolmentRow> Rows { get; set; } = new();
+    }
 }

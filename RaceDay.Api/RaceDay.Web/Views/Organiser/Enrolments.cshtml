@@ -1,0 +1,70 @@
+﻿@model RaceDay.Web.Models.OrgEnrolmentsVm
+@{
+    ViewData["Title"] = "Enrolments";
+}
+
+<div class="page-header">
+    <h2 class="mb-1">Enrolments</h2>
+    <p class="mb-3 opacity-75">@Model.EventName · @Model.Rows.Count participant(s)</p>
+    <a asp-controller="ManageEvents" asp-action="Index" class="btn btn-outline-light btn-sm">← Back to events</a>
+    <a asp-action="Results" asp-route-eventId="@Model.EventId" class="btn btn-warning btn-sm ms-2">Capture results</a>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">✅ @TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">⚠️ @TempData["Error"]</div>
+}
+
+@if (!Model.Rows.Any())
+{
+    <div class="card">
+        <div class="card-body text-center text-muted py-5">
+            Nobody has enrolled in this event yet.
+        </div>
+    </div>
+}
+else
+{
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Participant</th>
+                            <th>Category</th>
+                            <th>Status</th>
+                            <th>Enrolled</th>
+                            <th>Result</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var r in Model.Rows)
+                        {
+                            <tr>
+                                <td><strong>@r.ParticipantName</strong></td>
+                                <td>@r.CategoryName</td>
+                                <td><partial name="_StatusBadge" model="r.Status" /></td>
+                                <td class="meta">@r.EnrolledAt.ToLocalTime().ToString("dd MMM yyyy HH:mm")</td>
+                                <td>
+                                    @if (r.HasResult)
+                                    {
+                                        <span>@r.FinishTime · position @r.FinishPosition</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="meta">Not captured</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}

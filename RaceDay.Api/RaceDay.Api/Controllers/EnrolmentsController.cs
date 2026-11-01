@@ -92,7 +92,10 @@ namespace RaceDay.Api.Controllers
                     ParticipantName = en.Participant!.FullName,
                     CategoryName = en.Category!.CategoryName,
                     en.Status,
-                    en.EnrolledAt
+                    en.EnrolledAt,
+                    HasResult = en.Result != null,
+                    FinishTime = en.Result != null ? en.Result.FinishTime : (TimeSpan?)null,
+                    FinishPosition = en.Result != null ? en.Result.FinishPosition : (int?)null
                 })
                 .ToListAsync();
 

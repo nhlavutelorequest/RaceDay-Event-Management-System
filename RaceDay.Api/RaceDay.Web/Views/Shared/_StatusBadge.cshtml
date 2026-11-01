@@ -1,0 +1,10 @@
+﻿@model string
+@{
+    var cls = (Model ?? "").ToLowerInvariant() switch
+    {
+        "confirmed" => "status-confirmed",
+        "cancelled" => "status-cancelled",
+        _ => "status-pending"
+    };
+}
+<span class="status-badge @cls">@Model</span>
