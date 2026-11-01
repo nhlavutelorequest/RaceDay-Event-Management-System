@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Json;
 using Microsoft.AspNetCore.Mvc;
+using RaceDay.Web.Filters;
 using RaceDay.Web.Services;
 
 namespace RaceDay.Web.Controllers
@@ -14,6 +15,7 @@ namespace RaceDay.Web.Controllers
         public DateTime EnrolledAt { get; set; }
     }
 
+    [SessionAuthorize("Participant")]
     public class EnrolmentsController : Controller
     {
         private readonly ApiClient _api;
@@ -27,9 +29,6 @@ namespace RaceDay.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Enrol(int eventId, int categoryId)
         {
-            if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserName")))
-                return RedirectToAction("Login", "Account");
-
             var res = await _api.PostAsync($"api/events/{eventId}/enrolments", new { categoryId });
 
             if (res.IsSuccessStatusCode)
@@ -48,9 +47,6 @@ namespace RaceDay.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Mine()
         {
-            if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserName")))
-                return RedirectToAction("Login", "Account");
-
             var res = await _api.GetAsync("api/enrolments/me");
             if (!res.IsSuccessStatusCode)
             {

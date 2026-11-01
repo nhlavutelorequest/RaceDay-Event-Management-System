@@ -1,6 +1,8 @@
 ﻿@using Microsoft.AspNetCore.Http
 @{
     var userName = Context.Session.GetString("UserName");
+    var role = Context.Session.GetString("Role") ?? "";
+    var isOrganiser = role.Equals("Organiser", StringComparison.OrdinalIgnoreCase);
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -32,7 +34,14 @@
                         }
                         else
                         {
-                            <li class="nav-item"><a class="nav-link" asp-controller="Enrolments" asp-action="Index">My Enrolments</a></li>
+                            if (isOrganiser)
+                            {
+                                <li class="nav-item"><span class="nav-link"><span class="badge bg-warning text-dark">Organiser</span></span></li>
+                            }
+                            else
+                            {
+                                <li class="nav-item"><a class="nav-link" asp-controller="Enrolments" asp-action="Index">My Enrolments</a></li>
+                            }
                             <li class="nav-item"><span class="nav-link text-warning">Hi, @userName</span></li>
                             <li class="nav-item"><a class="nav-link" asp-controller="Account" asp-action="Logout">Logout</a></li>
                         }

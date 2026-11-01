@@ -63,6 +63,8 @@ namespace RaceDay.Web.Controllers
             return RedirectToAction("Index", "Events");
         }
 
+        public IActionResult AccessDenied() => View();
+
         public async Task<IActionResult> Logout()
         {
             await _api.PostAsync("api/auth/logout");
