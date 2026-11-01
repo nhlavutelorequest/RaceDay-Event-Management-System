@@ -52,5 +52,16 @@ namespace RaceDay.Web.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult HttpStatus(int code)
+        {
+            ViewBag.Code = code;
+            ViewBag.Heading = code == 404 ? "Page not found" : "Something went wrong";
+            ViewBag.Message = code == 404
+                ? "We couldn't find the page you were looking for."
+                : "We couldn't complete that request. Please try again.";
+            return View();
+        }
     }
 }
