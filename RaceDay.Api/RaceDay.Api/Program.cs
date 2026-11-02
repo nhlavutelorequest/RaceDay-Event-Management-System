@@ -1,12 +1,18 @@
 using Microsoft.EntityFrameworkCore;
 using RaceDay.Api.Data;
+using RaceDay.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Load local secrets (Azure connection string) whatever environment the API starts in
+builder.Configuration.AddUserSecrets<Program>(optional: true); // NEW
 
 builder.Services.AddControllers();
 
 builder.Services.AddDbContext<RaceDayDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddSingleton<IBlobStorageService, BlobStorageService>();
 
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>

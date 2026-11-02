@@ -34,6 +34,7 @@ namespace RaceDay.Api.Controllers
                 user.FullName,
                 user.Email,
                 user.PhoneNumber,
+                user.ProfileImageUrl,
                 Role = user.Role!.RoleName,
                 user.CreatedAt
             });
