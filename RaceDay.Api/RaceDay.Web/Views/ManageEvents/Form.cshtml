@@ -13,7 +13,7 @@
     <div class="card-body">
         <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
 
-        <form asp-action="Save" method="post">
+        <form asp-action="Save" method="post" enctype="multipart/form-data">
             <input type="hidden" asp-for="EventId" />
             <input type="hidden" asp-for="BannerImageUrl" />
 
@@ -43,12 +43,12 @@
             </div>
 
             <div class="row">
-                <div class="col-md-6 mb-4">
+                <div class="col-md-6 mb-3">
                     <label asp-for="DistanceKm" class="form-label">Distance (km)</label>
                     <input asp-for="DistanceKm" type="number" step="0.01" class="form-control" />
                     <span asp-validation-for="DistanceKm" class="text-danger small"></span>
                 </div>
-                <div class="col-md-6 mb-4">
+                <div class="col-md-6 mb-3">
                     <label asp-for="EventType" class="form-label">Event type</label>
                     <select asp-for="EventType" class="form-select">
                         <option value="">Choose a type...</option>
@@ -58,6 +58,21 @@
                     </select>
                     <span asp-validation-for="EventType" class="text-danger small"></span>
                 </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label" for="banner">Banner image</label>
+                @if (!string.IsNullOrWhiteSpace(Model.BannerImageUrl))
+                {
+                    <div class="mb-2">
+                        <img src="@Model.BannerImageUrl" alt="Current banner"
+                             style="max-height:160px;max-width:100%;border-radius:12px;object-fit:cover;" />
+                        <div class="meta small mt-1">Current banner. Choose a new file to replace it.</div>
+                    </div>
+                }
+                <input id="banner" name="banner" type="file" class="form-control"
+                       accept="image/png,image/jpeg,image/webp,image/gif" />
+                <div class="meta small mt-1">JPG, PNG, WEBP or GIF, up to 5 MB. Optional.</div>
             </div>
 
             <button type="submit" class="btn btn-warning">@(isNew ? "Create event" : "Save changes")</button>

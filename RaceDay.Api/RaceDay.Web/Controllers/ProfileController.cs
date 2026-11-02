@@ -11,6 +11,7 @@ namespace RaceDay.Web.Controllers
     {
         public string? Email { get; set; }
         public string? Role { get; set; }
+        public string? ProfileImageUrl { get; set; }
 
         [Required(ErrorMessage = "Full name is required."), MaxLength(100, ErrorMessage = "Full name is too long.")]
         public string FullName { get; set; } = "";
@@ -22,6 +23,8 @@ namespace RaceDay.Web.Controllers
     [SessionAuthorize]
     public class ProfileController : Controller
     {
+        private const long MaxImageBytes = 5 * 1024 * 1024;
+
         private readonly ApiClient _api;
 
         public ProfileController(ApiClient api)
@@ -46,7 +49,9 @@ namespace RaceDay.Web.Controllers
                 Email = json.GetProperty("email").GetString(),
                 Role = json.GetProperty("role").GetString(),
                 PhoneNumber = json.TryGetProperty("phoneNumber", out var p) && p.ValueKind == JsonValueKind.String
-                    ? p.GetString() : null
+                    ? p.GetString() : null,
+                ProfileImageUrl = json.TryGetProperty("profileImageUrl", out var img) && img.ValueKind == JsonValueKind.String
+                    ? img.GetString() : null
             };
             return View(vm);
         }
@@ -66,6 +71,31 @@ namespace RaceDay.Web.Controllers
 
             HttpContext.Session.SetString("UserName", vm.FullName.Trim());
             TempData["Success"] = "Profile updated.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UploadPicture(IFormFile? picture)
+        {
+            if (picture == null || picture.Length == 0)
+            {
+                TempData["Error"] = "Please choose an image first.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (picture.Length > MaxImageBytes)
+            {
+                TempData["Error"] = "The image is too large. The maximum size is 5 MB.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var res = await _api.PostFileAsync("api/users/me/picture", picture);
+            if (res.IsSuccessStatusCode)
+                TempData["Success"] = "Profile picture updated.";
+            else
+                TempData["Error"] = await ApiClient.ReadMessageAsync(res, "Could not upload your picture. Please try again.");
+
             return RedirectToAction(nameof(Index));
         }
     }
