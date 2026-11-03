@@ -1,0 +1,9 @@
+**/bin/
+**/obj/
+**/.vs/
+**/*.user
+.git
+.github
+docs
+RaceDay.Api/RaceDay.Api/
+RaceDay.Api/RaceDay.Api.Tests/
