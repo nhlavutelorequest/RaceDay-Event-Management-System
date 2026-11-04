@@ -1,4 +1,11 @@
 ﻿/* Shared styles for the Login and Register pages */
+
+/* Hide the browser's own show-password and clear icons so only our eye button shows */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+    display: none;
+}
+
 .pw-wrap {
     position: relative;
 }
