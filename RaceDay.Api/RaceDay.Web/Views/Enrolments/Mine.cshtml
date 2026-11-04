@@ -3,7 +3,10 @@
     ViewData["Title"] = "My Enrolments";
 }
 
-<h2 class="mb-4">My Enrolments</h2>
+<div class="page-header">
+    <h2 class="mb-1">My Enrolments</h2>
+    <p class="mb-0 opacity-75">Track the events you've entered.</p>
+</div>
 
 @if (TempData["Success"] != null)
 {
@@ -28,17 +31,16 @@ else
     <div class="row g-3">
         @foreach (var e in Model)
         {
-            var badge = e.Status switch { "Confirmed" => "success", "Cancelled" => "danger", _ => "warning text-dark" };
             <div class="col-md-6">
                 <div class="card h-100">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-start">
                             <h5 class="mb-1">@e.EventName</h5>
-                            <span class="badge bg-@badge">@e.Status</span>
+                            <partial name="_StatusBadge" model="e.Status" />
                         </div>
-                        <div class="text-muted small mb-2">📅 @e.EventDate.ToString("dd MMM yyyy, HH:mm")</div>
+                        <div class="meta mb-2">📅 @e.EventDate.ToString("dd MMM yyyy, HH:mm")</div>
                         <div>🏷️ Category: <strong>@e.CategoryName</strong></div>
-                        <div class="text-muted small mt-2">Enrolled @e.EnrolledAt.ToLocalTime().ToString("dd MMM yyyy HH:mm")</div>
+                        <div class="meta small mt-2">Enrolled @e.EnrolledAt.ToLocalTime().ToString("dd MMM yyyy HH:mm")</div>
                     </div>
                 </div>
             </div>
