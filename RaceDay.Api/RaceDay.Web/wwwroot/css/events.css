@@ -1,0 +1,46 @@
+﻿/* Event cards: tag for events that have already taken place */
+.finished-tag {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: rgba(15, 23, 42, .85);
+    color: #fff;
+    font-size: .75rem;
+    font-weight: 700;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+    padding: .35rem .8rem;
+    border-radius: 999px;
+}
+
+/* Event details: category picker in the RaceDay amber instead of Bootstrap blue */
+.category-option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 1rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    background: #fff;
+    color: var(--rd-text);
+    cursor: pointer;
+    transition: border-color .15s, background .15s, box-shadow .15s;
+}
+
+.btn-check + .category-option:hover {
+    border-color: var(--rd-accent);
+}
+
+.btn-check:checked + .category-option {
+    border-color: var(--rd-accent);
+    background: #fffbeb;
+    box-shadow: 0 0 0 .2rem rgba(245, 158, 11, .2);
+}
+
+.btn-check:focus-visible + .category-option {
+    box-shadow: 0 0 0 .2rem rgba(245, 158, 11, .4);
+}
+
+.category-option.static {
+    cursor: default;
+}
