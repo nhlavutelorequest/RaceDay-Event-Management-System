@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Json;
+﻿using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Text.Json;
 
 namespace RaceDay.Web.Services
@@ -32,6 +33,18 @@ namespace RaceDay.Web.Services
 
         public Task<HttpResponseMessage> DeleteAsync(string url) =>
             SendAsync(new HttpRequestMessage(HttpMethod.Delete, url));
+
+        // Sends an uploaded file on to the API (the API is the only thing that talks to Azure)
+        public Task<HttpResponseMessage> PostFileAsync(string url, IFormFile file, string fieldName = "file")
+        {
+            var content = new MultipartFormDataContent();
+            var fileContent = new StreamContent(file.OpenReadStream());
+            fileContent.Headers.ContentType = new MediaTypeHeaderValue(
+                string.IsNullOrWhiteSpace(file.ContentType) ? "application/octet-stream" : file.ContentType);
+            content.Add(fileContent, fieldName, file.FileName);
+
+            return SendAsync(new HttpRequestMessage(HttpMethod.Post, url) { Content = content });
+        }
 
         private async Task<HttpResponseMessage> SendAsync(HttpRequestMessage req)
         {

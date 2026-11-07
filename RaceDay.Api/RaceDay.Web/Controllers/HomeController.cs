@@ -17,9 +17,9 @@ namespace RaceDay.Web.Controllers
             _api = api;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? search, string? type)
         {
-            var featured = new List<EventListItem>();
+            var upcoming = new List<EventListItem>();
 
             try
             {
@@ -27,19 +27,27 @@ namespace RaceDay.Web.Controllers
                 if (res.IsSuccessStatusCode)
                 {
                     var events = await res.Content.ReadFromJsonAsync<List<EventListItem>>() ?? new();
-                    featured = events
-                        .Where(e => e.EventDate >= DateTime.Now)
-                        .OrderBy(e => e.EventDate)
-                        .Take(3)
-                        .ToList();
+                    upcoming = events.Where(e => e.EventDate >= DateTime.Now).ToList();
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "Could not load featured events.");
+                _logger.LogWarning(ex, "Could not load upcoming events.");
             }
 
-            return View(featured);
+            if (!string.IsNullOrWhiteSpace(search))
+                upcoming = upcoming.Where(e =>
+                    e.Name.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                    e.Location.Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
+
+            if (!string.IsNullOrWhiteSpace(type))
+                upcoming = upcoming.Where(e =>
+                    string.Equals(e.EventType, type, StringComparison.OrdinalIgnoreCase)).ToList();
+
+            ViewBag.Search = search;
+            ViewBag.Type = type;
+
+            return View(upcoming.OrderBy(e => e.EventDate).ToList());
         }
 
         public IActionResult Privacy()
@@ -51,6 +59,17 @@ namespace RaceDay.Web.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult HttpStatus(int code)
+        {
+            ViewBag.Code = code;
+            ViewBag.Heading = code == 404 ? "Page not found" : "Something went wrong";
+            ViewBag.Message = code == 404
+                ? "We couldn't find the page you were looking for."
+                : "We couldn't complete that request. Please try again.";
+            return View();
         }
     }
 }

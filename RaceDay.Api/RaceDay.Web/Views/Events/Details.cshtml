@@ -3,8 +3,12 @@
     ViewData["Title"] = Model.Name;
     var role = Context.Session.GetString("Role");
     var loggedIn = !string.IsNullOrEmpty(Context.Session.GetString("UserName"));
+    var isParticipant = loggedIn && string.Equals(role, "Participant", StringComparison.OrdinalIgnoreCase);
+    var hasCategories = Model.Categories.Any();
     string Icon(string t) => t.ToLower() switch { "run" => "🏃", "walk" => "🚶", "cycle" => "🚴", _ => "🏅" };
 }
+
+<link rel="stylesheet" href="~/css/events.css" asp-append-version="true" />
 
 <a asp-action="Index" class="text-decoration-none text-muted">&larr; Back to events</a>
 @if (TempData["Error"] != null)
@@ -31,23 +35,42 @@
 
         <div class="card">
             <div class="card-body">
-                <h5 class="mb-3">Categories</h5>
-                @if (!Model.Categories.Any())
+                <h5 class="mb-1">Categories</h5>
+                @if (!hasCategories)
                 {
                     <p class="text-muted mb-0">No categories have been added yet.</p>
                 }
                 else
                 {
+                    @if (isParticipant)
+                    {
+                        <p class="meta small mb-3">Choose a category, then click <strong>Enrol now</strong>.</p>
+                    }
+                    else
+                    {
+                        <div class="mb-3"></div>
+                    }
                     <div class="row g-3">
                         @foreach (var c in Model.Categories)
                         {
+                            var description = string.IsNullOrWhiteSpace(c.Description) ? "Open category" : c.Description;
                             <div class="col-md-6">
-                                <input type="radio" class="btn-check" name="categoryId" id="cat-@c.CategoryId"
-                                       value="@c.CategoryId" form="enrolForm" required />
-                                <label class="btn btn-outline-primary w-100 text-start p-3" for="cat-@c.CategoryId">
-                                    <strong>@c.CategoryName</strong>
-                                    <div class="small opacity-75">@(string.IsNullOrWhiteSpace(c.Description) ? "Open category" : c.Description)</div>
-                                </label>
+                                @if (isParticipant)
+                                {
+                                    <input type="radio" class="btn-check" name="categoryId" id="cat-@c.CategoryId"
+                                           value="@c.CategoryId" form="enrolForm" required />
+                                    <label class="category-option" for="cat-@c.CategoryId">
+                                        <strong>@c.CategoryName</strong>
+                                        <div class="small opacity-75">@description</div>
+                                    </label>
+                                }
+                                else
+                                {
+                                    <div class="category-option static">
+                                        <strong>@c.CategoryName</strong>
+                                        <div class="small opacity-75">@description</div>
+                                    </div>
+                                }
                             </div>
                         }
                     </div>
@@ -70,12 +93,20 @@
                 {
                     <a class="btn btn-warning w-100" asp-controller="Account" asp-action="Login">Login to enrol</a>
                 }
-                else if (role == "Participant")
+                else if (isParticipant)
                 {
-                    <form id="enrolForm" method="post" asp-controller="Enrolments" asp-action="Enrol">
-                        <input type="hidden" name="eventId" value="@Model.EventId" />
-                        <button type="submit" class="btn btn-warning w-100">Enrol now</button>
-                    </form>
+                    if (hasCategories)
+                    {
+                        <form id="enrolForm" method="post" asp-controller="Enrolments" asp-action="Enrol">
+                            <input type="hidden" name="eventId" value="@Model.EventId" />
+                            <button type="submit" class="btn btn-warning w-100">Enrol now</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <button type="button" class="btn btn-warning w-100" disabled>Enrol now</button>
+                        <div class="meta small text-center mt-2">Enrolment opens once the organiser adds categories.</div>
+                    }
                 }
                 else
                 {

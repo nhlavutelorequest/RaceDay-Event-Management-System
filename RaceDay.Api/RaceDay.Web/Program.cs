@@ -13,18 +13,30 @@ builder.Services.AddSession(o =>
 builder.Services.AddHttpClient("RaceDayApi", c =>
 {
     c.BaseAddress = new Uri(builder.Configuration["ApiBaseUrl"]!);
-}).ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+}).ConfigurePrimaryHttpMessageHandler(() =>
 {
-    UseCookies = false // we forward each user's API cookie ourselves
+    var handler = new HttpClientHandler
+    {
+        UseCookies = false // we forward each user's API cookie ourselves
+    };
+
+    // NEW: Docker only. The API's local dev certificate is issued for "localhost",
+    // not "host.docker.internal", so the container run command turns this on.
+    if (builder.Configuration.GetValue<bool>("ApiAllowInvalidCert"))
+        handler.ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
+
+    return handler;
 });
 
 builder.Services.AddScoped<RaceDay.Web.Services.ApiClient>();
 
 var app = builder.Build();
 
+app.UseExceptionHandler("/Home/Error");
+app.UseStatusCodePagesWithReExecute("/Home/HttpStatus", "?code={0}");
+
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
 

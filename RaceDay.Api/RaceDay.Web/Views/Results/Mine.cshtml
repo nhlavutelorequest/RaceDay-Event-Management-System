@@ -1,0 +1,60 @@
+﻿@model List<RaceDay.Web.Controllers.MyResultVm>
+@{
+    ViewData["Title"] = "My Results";
+}
+@functions {
+    static string Ordinal(int n)
+    {
+        var rem100 = n % 100;
+        if (rem100 >= 11 && rem100 <= 13) return n + "th";
+        return (n % 10) switch
+        {
+            1 => n + "st",
+            2 => n + "nd",
+            3 => n + "rd",
+            _ => n + "th"
+        };
+    }
+}
+
+<div class="page-header">
+    <h2 class="mb-1">My Results</h2>
+    <p class="mb-0 opacity-75">Your race history across all completed events.</p>
+</div>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">⚠️ @TempData["Error"]</div>
+}
+
+@if (!Model.Any())
+{
+    <div class="card">
+        <div class="card-body text-center text-muted py-5">
+            No results yet. Your times appear here once an organiser captures them.<br />
+            <a asp-controller="Events" asp-action="Index" class="btn btn-warning mt-3">Browse events</a>
+        </div>
+    </div>
+}
+else
+{
+    <div class="row g-3">
+        @foreach (var r in Model)
+        {
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="mb-1">@r.EventName</h5>
+                        <div class="meta mb-3">📅 @r.EventDate.ToString("dd MMM yyyy")</div>
+                        <div class="fact"><span>🏷️ Category</span><strong>@r.CategoryName</strong></div>
+                        <div class="fact"><span>⏱️ Finish time</span><strong>@r.FinishTime</strong></div>
+                        <div class="fact">
+                            <span>🏅 Position</span>
+                            <strong>@Ordinal(r.FinishPosition) of @r.TotalFinishers finishers</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

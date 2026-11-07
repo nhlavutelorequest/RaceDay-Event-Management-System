@@ -40,6 +40,32 @@ namespace RaceDay.Api.Controllers
             return Ok(events);
         }
 
+        // GET /api/events/mine - Organiser only, own events with enrolment counts
+        [HttpGet("mine")]
+        [SessionAuthorize("Organiser")]
+        public async Task<IActionResult> GetMine()
+        {
+            var events = await _context.Events
+                .Where(e => e.OrganiserId == CurrentUserId)
+                .OrderBy(e => e.EventDate)
+                .Select(e => new
+                {
+                    e.EventId,
+                    e.Name,
+                    e.Description,
+                    e.EventDate,
+                    e.Location,
+                    e.DistanceKm,
+                    e.EventType,
+                    e.BannerImageUrl,
+                    OrganiserName = e.Organiser!.FullName,
+                    EnrolmentCount = _context.Enrolments.Count(en => en.EventId == e.EventId)
+                })
+                .ToListAsync();
+
+            return Ok(events);
+        }
+
         // GET /api/events/{id} - public, includes categories
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)

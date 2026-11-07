@@ -2,8 +2,9 @@ name: RaceDay CI
 
 on:
   push:
-    branches: [ main, part3-mvc ]
+    branches: [ "**" ]
   pull_request:
+    branches: [ "**" ]
 
 env:
   SOLUTION: RaceDay.Api/RaceDay.Api/RaceDay.Api.sln

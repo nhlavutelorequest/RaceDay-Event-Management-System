@@ -1,0 +1,14 @@
+﻿@{
+    ViewData["Title"] = (string)ViewBag.Heading;
+}
+
+<div class="card mt-4">
+    <div class="card-body text-center py-5">
+        <div style="font-size:3.5rem">🏁</div>
+        <h1 class="display-4 fw-bold">@ViewBag.Code</h1>
+        <h2>@ViewBag.Heading</h2>
+        <p class="meta">@ViewBag.Message</p>
+        <a class="btn btn-warning mt-2" asp-controller="Home" asp-action="Index">Back to home</a>
+        <a class="btn btn-outline-dark mt-2 ms-2" asp-controller="Events" asp-action="Index">Browse events</a>
+    </div>
+</div>

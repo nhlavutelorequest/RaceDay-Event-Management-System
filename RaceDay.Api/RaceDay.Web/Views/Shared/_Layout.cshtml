@@ -1,6 +1,15 @@
 ﻿@using Microsoft.AspNetCore.Http
 @{
     var userName = Context.Session.GetString("UserName");
+    var role = Context.Session.GetString("Role") ?? "";
+    var isOrganiser = role.Equals("Organiser", StringComparison.OrdinalIgnoreCase);
+
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+    var action = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+    bool Is(string c, string a = "") =>
+        controller.Equals(c, StringComparison.OrdinalIgnoreCase) &&
+        (a == "" || action.Equals(a, StringComparison.OrdinalIgnoreCase));
+    string Active(bool on) => on ? "active" : "";
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -10,6 +19,7 @@
     <title>@ViewData["Title"] - RaceDay</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/nav.css" asp-append-version="true" />
 </head>
 <body>
     <header>
@@ -21,18 +31,32 @@
                 </button>
                 <div class="collapse navbar-collapse" id="nav">
                     <ul class="navbar-nav me-auto">
-                        <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Index">Home</a></li>
-                        <li class="nav-item"><a class="nav-link" asp-controller="Events" asp-action="Index">Events</a></li>
+                        <li class="nav-item"><a class="nav-link @Active(Is("Home", "Index"))" asp-controller="Home" asp-action="Index">Home</a></li>
+                        <li class="nav-item"><a class="nav-link @Active(Is("Events"))" asp-controller="Events" asp-action="Index">Events</a></li>
+                        @if (!string.IsNullOrEmpty(userName) && isOrganiser)
+                        {
+                            <li class="nav-item"><a class="nav-link @Active(Is("Organiser", "Dashboard"))" asp-controller="Organiser" asp-action="Dashboard">Dashboard</a></li>
+                            <li class="nav-item"><a class="nav-link @Active(Is("ManageEvents") || (Is("Organiser") && !Is("Organiser", "Dashboard")))" asp-controller="ManageEvents" asp-action="Index">Manage Events</a></li>
+                        }
                     </ul>
                     <ul class="navbar-nav">
                         @if (string.IsNullOrEmpty(userName))
                         {
-                            <li class="nav-item"><a class="nav-link" asp-controller="Account" asp-action="Login">Login</a></li>
+                            <li class="nav-item"><a class="nav-link @Active(Is("Account", "Login"))" asp-controller="Account" asp-action="Login">Login</a></li>
                             <li class="nav-item"><a class="btn btn-warning btn-sm ms-2" asp-controller="Account" asp-action="Register">Register</a></li>
                         }
                         else
                         {
-                            <li class="nav-item"><a class="nav-link" asp-controller="Enrolments" asp-action="Index">My Enrolments</a></li>
+                            if (isOrganiser)
+                            {
+                                <li class="nav-item"><span class="nav-link"><span class="badge bg-warning text-dark">Organiser</span></span></li>
+                            }
+                            else
+                            {
+                                <li class="nav-item"><a class="nav-link @Active(Is("Enrolments"))" asp-controller="Enrolments" asp-action="Index">My Enrolments</a></li>
+                                <li class="nav-item"><a class="nav-link @Active(Is("Results"))" asp-controller="Results" asp-action="Mine">My Results</a></li>
+                            }
+                            <li class="nav-item"><a class="nav-link @Active(Is("Profile"))" asp-controller="Profile" asp-action="Index">Profile</a></li>
                             <li class="nav-item"><span class="nav-link text-warning">Hi, @userName</span></li>
                             <li class="nav-item"><a class="nav-link" asp-controller="Account" asp-action="Logout">Logout</a></li>
                         }
@@ -48,7 +72,7 @@
         </main>
     </div>
 
-    <footer class="border-top text-muted py-3 mt-4">
+    <footer class="border-top py-3 mt-4">
         <div class="container">&copy; 2026 RaceDay Event Management</div>
     </footer>
 

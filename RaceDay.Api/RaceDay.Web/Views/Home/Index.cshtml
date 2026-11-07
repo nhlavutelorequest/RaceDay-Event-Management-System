@@ -2,6 +2,9 @@
 @{
     ViewData["Title"] = "Home";
     var loggedIn = !string.IsNullOrEmpty(Context.Session.GetString("UserName"));
+    var search = ViewBag.Search as string;
+    var type = ViewBag.Type as string;
+    var filtered = !string.IsNullOrWhiteSpace(search) || !string.IsNullOrWhiteSpace(type);
     string Icon(string t) => t.ToLower() switch { "run" => "🏃", "walk" => "🚶", "cycle" => "🚴", _ => "🏅" };
 }
 
@@ -14,7 +17,7 @@
         <h1>Find your next<br />finish line.</h1>
         <p class="lead">Discover running, walking and cycling events near you, and enrol in seconds.</p>
         <div class="d-flex gap-2 justify-content-center flex-wrap">
-            <a class="btn btn-warning btn-lg" asp-controller="Events" asp-action="Index">Browse events</a>
+            <a class="btn btn-warning btn-lg" href="#upcoming">Browse events</a>
             @if (!loggedIn)
             {
                 <a class="btn btn-outline-light btn-lg" asp-controller="Account" asp-action="Register">Create account</a>
@@ -32,19 +35,19 @@
     <p class="text-muted mb-4">Three ways to get moving. Pick what suits you.</p>
     <div class="row g-4">
         <div class="col-md-4">
-            <a class="type-tile tile-run" asp-controller="Events" asp-action="Index" asp-route-type="Run"
+            <a class="type-tile tile-run" asp-controller="Home" asp-action="Index" asp-route-type="Run" asp-fragment="upcoming"
                style="background-image:url('@Url.Content("~/images/run.jpg")'), linear-gradient(135deg,#0f172a,#2563eb)">
                 <div class="type-tile-text"><span>🏃</span><h4>Run</h4><small>5K, 10K, half marathons and more</small></div>
             </a>
         </div>
         <div class="col-md-4">
-            <a class="type-tile tile-walk" asp-controller="Events" asp-action="Index" asp-route-type="Walk"
+            <a class="type-tile tile-walk" asp-controller="Home" asp-action="Index" asp-route-type="Walk" asp-fragment="upcoming"
                style="background-image:url('@Url.Content("~/images/walk.jpg")'), linear-gradient(135deg,#064e3b,#10b981)">
                 <div class="type-tile-text"><span>🚶</span><h4>Walk</h4><small>Fun walks for every fitness level</small></div>
             </a>
         </div>
         <div class="col-md-4">
-            <a class="type-tile tile-cycle" asp-controller="Events" asp-action="Index" asp-route-type="Cycle"
+            <a class="type-tile tile-cycle" asp-controller="Home" asp-action="Index" asp-route-type="Cycle" asp-fragment="upcoming"
                style="background-image:url('@Url.Content("~/images/cycle.jpg")'), linear-gradient(135deg,#4c1d95,#f59e0b)">
                 <div class="type-tile-text"><span>🚴</span><h4>Cycle</h4><small>Road and trail rides across the country</small></div>
             </a>
@@ -52,16 +55,49 @@
     </div>
 </section>
 
-@if (Model.Any())
-{
-    <section class="mt-5">
-        <div class="d-flex justify-content-between align-items-end mb-4">
-            <div>
-                <h3 class="section-title mb-1">Featured events</h3>
-                <p class="text-muted mb-0">The next races on the calendar.</p>
-            </div>
-            <a asp-controller="Events" asp-action="Index" class="fw-semibold text-decoration-none">See all events &rarr;</a>
+<section class="mt-5" id="upcoming">
+    <div class="d-flex justify-content-between align-items-end mb-3 flex-wrap gap-2">
+        <div>
+            <h3 class="section-title mb-1">Upcoming events</h3>
+            <p class="text-muted mb-0">Search or filter the races that are still to come.</p>
         </div>
+        <a asp-controller="Events" asp-action="Index" class="fw-semibold text-decoration-none">See all events &rarr;</a>
+    </div>
+
+    <form method="get" asp-controller="Home" asp-action="Index" asp-fragment="upcoming" class="row g-2 mb-4">
+        <div class="col-md-6">
+            <input type="text" name="search" value="@search" class="form-control"
+                   placeholder="Search by event name or location..." />
+        </div>
+        <div class="col-md-3">
+            <select name="type" class="form-select">
+                <option value="">All types</option>
+                <option value="Run" selected="@(type == "Run")">🏃 Run</option>
+                <option value="Walk" selected="@(type == "Walk")">🚶 Walk</option>
+                <option value="Cycle" selected="@(type == "Cycle")">🚴 Cycle</option>
+            </select>
+        </div>
+        <div class="col-md-3 d-grid">
+            <button type="submit" class="btn btn-dark">Filter</button>
+        </div>
+    </form>
+
+    @if (!Model.Any())
+    {
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <div style="font-size:2.5rem">🔍</div>
+                <h5 class="mt-2">No upcoming events found</h5>
+                <p class="text-muted mb-3">@(filtered ? "Try a different search or filter." : "Check back soon for new races.")</p>
+                @if (filtered)
+                {
+                    <a asp-controller="Home" asp-action="Index" asp-fragment="upcoming" class="btn btn-warning">Clear filters</a>
+                }
+            </div>
+        </div>
+    }
+    else
+    {
         <div class="row g-4">
             @foreach (var ev in Model)
             {
@@ -86,8 +122,8 @@
                 </div>
             }
         </div>
-    </section>
-}
+    }
+</section>
 
 <section class="mt-5">
     <h3 class="section-title">How it works</h3>
