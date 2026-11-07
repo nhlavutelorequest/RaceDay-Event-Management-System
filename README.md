@@ -288,13 +288,7 @@ A GitHub Actions workflow in `.github/workflows/ci.yml` runs on every push and p
 
 **Part 3 green build:**
 
-![Part 3 green build](docs/ci-green-build.png)
-
-**Part 2 green build:**
-
-<img width="1365" height="574" alt="Part 2 green build" src="https://github.com/user-attachments/assets/54b6e4c7-5212-4dda-9000-9a2f828d833c" />
-
----
+<img width="1341" height="726" alt="image" src="https://github.com/user-attachments/assets/82ced868-1cef-46a2-9118-97c55ff3f322" />
 
 ## Video Walkthroughs
 
