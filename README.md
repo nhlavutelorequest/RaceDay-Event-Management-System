@@ -296,7 +296,7 @@ A GitHub Actions workflow in `.github/workflows/ci.yml` runs on every push and p
 |---|---|
 | Part 1 - Planning and Database | https://youtu.be/fnTeI4-AHi4?si=Loz_87pzdS3DlO0j |
 | Part 2 - RESTful API | https://youtu.be/E3xnsPQr90I?si=lu1AK9K7cO_u4KCL |
-| Part 3 - MVC, Azure Blob Storage and Docker | PASTE_PART_3_UNLISTED_YOUTUBE_LINK_HERE |
+| Part 3 - MVC, Azure Blob Storage and Docker |https://youtu.be/uBD-ZSGXLBY?si=tZP9m_8SmjUZCI3D |
 
 **Part 3 video covers:**
 - The full running application for both roles, including the Docker container
